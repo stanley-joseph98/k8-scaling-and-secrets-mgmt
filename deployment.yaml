@@ -10,24 +10,35 @@ spec:
     matchLabels:
       app: myapp
   strategy:
+    type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: myapp
     spec:
       containers:
-      - image: us.icr.io/<your SN labs namespace>/myapp:v1
+      - name: myapp
+        image: us.icr.io/<your SN labs namespace>/myapp:v1
         imagePullPolicy: Always
-        name: myapp
         ports:
         - containerPort: 3000
           name: http
         resources:
           limits:
-            cpu: 50m
+            cpu: "50m"
           requests:
-            cpu: 20m
+            cpu: "20m"
+        env:
+        - name: MYAPP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secret
+              key: username
+        - name: MYAPP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secret
+              key: password
